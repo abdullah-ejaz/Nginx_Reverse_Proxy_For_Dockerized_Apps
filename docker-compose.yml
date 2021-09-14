@@ -1,0 +1,40 @@
+version: '3' #Version of YML file
+
+services:
+  pythonapp:
+    build: './pythonapp1'
+    expose:
+      - '5000'    
+    # ports:
+    #  - "5000:5000"
+    volumes:
+     - ./pythonapp1:/sampleapp
+    depends_on:
+     - redis
+       
+  redis:
+    image: redis   
+    expose:
+      - '6379' 
+
+  dockerstatic:
+    build: './static_docker_website'
+    volumes:
+      # - ./docker-static:/docker-static 
+      - ./static_docker_website/web:/usr/share/nginx/html    
+    restart: always
+    expose:
+      - '90'     
+    # ports:
+    #   - "9000:90"    
+
+  dockerproxy:
+    build: './docker-proxy'
+    volumes:
+      - ./docker-static:/docker-static       
+      # - ./docker-proxy:/docker-proxy
+    depends_on:
+      - pythonapp       
+    restart: always
+    ports:
+      - "8888:6000"  
